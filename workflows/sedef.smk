@@ -31,8 +31,11 @@ TRFBED = rules.trf.input.bed
 wildcard_constraints:
 	SM="|".join(SMS),
 
-localrules: sedef, run_sedef
+# this directory is to put temporary files in such a way as to not
+# collide with other users or the same user running another sedef
+TMPDIR = "/tmp/" + os.environ['USER'] + "/" + str( os.getpid() )
 
+localrules: sedef, run_sedef
 
 #
 # Make masked version of the fasta for sedef
@@ -91,8 +94,8 @@ rule run_sedef:
 	input:
 		fasta = rules.sedef_masked_fasta.output.fasta,
 	output:
-		tmpf = temp(f"/tmp/sedef/sedef_{SM}.fasta"),
-		fai = temp(f"/tmp/sedef/sedef_{SM}.fasta.fai"),
+		tmpf = temp(f"{TMPDIR}/sedef_{SM}.fasta"),
+		fai  = temp(f"{TMPDIR}/sedef_{SM}.fasta.fai"),
 		bed = f"SEDEF/{SM}/final.bed"
 	resources:
 		mem=8
@@ -134,7 +137,7 @@ rule find_cen:
         mem=8,
     threads:1
     shell:"""
-grep 'ALR/Alpha' {input.rm} | \
+grep 'ALR_Alpha' {input.rm} | \
         bedtools merge -d 50 -i - | \
         awk '($3-$2)>50' | \
         bedtools merge -d 100 -i - | \
