@@ -14,8 +14,8 @@ CWD=os.getcwd()
 shell.prefix(f"source {SDIR}/env.cfg ; set -eo pipefail; ")
 
 # added DG, Oct 18, 2022
-if not os.path.exists("log"):
-   os.makedirs("log")
+if not os.path.exists("Assembly_analysis/log"):
+   os.makedirs("Assembly_analysis/log")
 
 
 
