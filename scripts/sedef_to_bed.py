@@ -146,7 +146,9 @@ if __name__ == "__main__":
     #
     df.sort_values(by=["chr1", "start1"], inplace=True)
     bed9 = ["chr1", "start1", "end1", "name", "fakeScore", "strand1", "start1", "end1", "color"]
-    df["name"] = df.chr2 + ":" + df.start2.astype(str) + "-" + df.end2.astype(str)
+    #df["name"] = df.chr2 + ":" + df.start2.astype(str) + "-" + df.end2.astype(str)
+    # changed DG, Oct 2022 otherwise crashed on gibbon which has mainly numeric chromosome names
+    df["name"] = df.chr2.astype( str ) + ":" + df.start2.astype(str) + "-" + df.end2.astype(str)
     df["fakeScore"] = 0
     extra = [ col for col in SEDEF_HEADER if col not in bed9 and col not in DROP]
     extra += ["unique_id", "original"]
