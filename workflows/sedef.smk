@@ -34,6 +34,11 @@ wildcard_constraints:
 # this directory is to put temporary files in such a way as to not
 # collide with other users or the same user running another sedef
 TMPDIR = "/tmp/" + os.environ['USER'] + "/" + str( os.getpid() )
+# added DG, Oct 19, 2022
+if not os.path.exists( TMPDIR ):
+   os.makedirs( TMPDIR )
+
+
 
 localrules: sedef, run_sedef
 
@@ -183,8 +188,12 @@ rule sedef_bb:
         mem=8,
     threads: 1
     shell:"""
-bedToBigBed -type=bed9+32 -tab -as={SDIR}/templates/sedef.as {input.bed} {input.fai} {output.bb}
-bedToBigBed -type=bed9+32 -tab -as={SDIR}/templates/sedef.as {input.lowid} {input.fai} {output.lowid}
+grep '^#' {input.bed}   >{TMPDIR}/input.sorted.bed
+grep '^#' {input.lowid} >{TMPDIR}/lowid.sorted.bed
+grep -v '^#' {input.bed}   | sort -k1,1 -k2,2n >>{TMPDIR}/input.sorted.bed
+grep -v '^#' {input.lowid} | sort -k1,1 -k2,2n >>{TMPDIR}/lowid.sorted.bed
+bedToBigBed -type=bed9+32 -tab -as={SDIR}/templates/sedef.as {TMPDIR}/input.sorted.bed {input.fai} {output.bb}
+bedToBigBed -type=bed9+32 -tab -as={SDIR}/templates/sedef.as {TMPDIR}/lowid.sorted.bed {input.fai} {output.lowid}
 """
 
 rule sum_sedef:
