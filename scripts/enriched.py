@@ -48,7 +48,10 @@ if __name__ == "__main__":
    
     for chrm, region in bed.groupby("chr"):
         s = np.zeros( fai.chrlen[chrm], dtype=np.int8); s[:]=-1
-        sys.stderr.write("\r" + chrm)
+        # changed DG Oct 2022 to avoid this error:
+        # TypeError: can only concatenate str (not "int") to str 
+        # sys.stderr.write("\r" + chrm )
+        sys.stderr.write("\r" + str( chrm ) )
         for row in region.itertuples():
             s[row.start:row.end]=args.scale
             continue
